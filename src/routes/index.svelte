@@ -36,8 +36,6 @@
     nearWallet.requestSignIn(
       "example-contract.testnet", // contract requesting access
       "Example App", // optional
-      "http://localhost:3000", // optional
-      "http://localhost:3000", // optional
     )
   }
 
