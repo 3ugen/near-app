@@ -3,6 +3,7 @@
 
   let nearState = 'undefined'
   let nearWallet;
+  let accountName = 'undefined'
 
   onMount(async () => {
     // setup some globals
@@ -20,8 +21,9 @@
           console.log('connection state')
           console.table(res)
           const wallet = new nearApi.WalletConnection(res);
-          if (wallet.isConnected) {
+          if (wallet.isSignedIn()) {
             nearState = 'connected'
+            accountName = wallet.getAccountId();
           } else {
             nearState = 'disconnected'
           }
@@ -36,10 +38,23 @@
     nearWallet.requestSignIn(
       "example-contract.testnet", // contract requesting access
       "Example App", // optional
+      'https://near-app.pages.dev',
+      'https://near-app.pages.dev',
     )
+  }
+
+  async function nearDisconnect() {
+    nearWallet.signOut();
+    nearState = 'undefined'
+    accountName = 'undefined'
   }
 
 </script>
 <h1>Welcome to Near</h1>
 <p>Near connection state: {nearState}</p>
-<button on:click={nearConnect}>connect to Near</button>
+<p>Near account name: {accountName}</p>
+{#if nearState === 'undefined'}
+  <button on:click={nearConnect}>connect to Near</button>
+{:else}
+  <button on:click={nearDisconnect}>Disconnect</button>
+{/if}
