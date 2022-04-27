@@ -3,6 +3,8 @@ use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
 use near_sdk::serde::Serialize;
 
+near_sdk::setup_alloc!();
+
 #[derive(Debug, Serialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct Channel {
@@ -59,5 +61,9 @@ impl Contract {
             }
             None => "not found".to_string()
         }
+    }
+
+    pub fn get_item_oracle(&self) -> String {
+        "item oracle success".to_string()
     }
 }
