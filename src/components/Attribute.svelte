@@ -18,7 +18,7 @@
            id={attrId+'n'}
            name="name"
            value={value}
-           min=0 max=100
+           min=1000 max=20000
            on:keyup={e => value = e.target.value}
     >
   {/if}

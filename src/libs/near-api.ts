@@ -2,7 +2,8 @@ import type {ConnectConfig, Contract, Near, WalletConnection} from "near-api-js"
 
 type OracleContractT = Contract & {
     get_item(arg0: ArgsGet): Promise<string>,
-    add_item(arg0: ArgsAdd): Promise<void>
+    all_keys(): Promise<string>,
+    add_item(arg0: ArgsAdd): Promise<void>,
 }
 
 class ArgsGet {
@@ -15,27 +16,27 @@ class ArgsGet {
 
 class ArgsAdd {
     item_id: string
-    direct: number
-    email: number
-    fb: number
-    g_search: number
-    organic: number
-    youtube: number
+    model: string
+    binance: number
+    coinbase: number
+    okx: number
+    ftx: number
+    kraken: number
 
     public constructor(item_id: string,
-                       direct: number,
-                       email: number,
-                       fb: number,
-                       g_search: number,
-                       organic: number,
-                       youtube: number) {
+                       model: string,
+                       binance: number,
+                       coinbase: number,
+                       okx: number,
+                       ftx: number,
+                       kraken: number) {
         this.item_id = item_id
-        this.direct = direct
-        this.email = email
-        this.fb = fb
-        this.g_search = g_search
-        this.organic = organic
-        this.youtube = youtube
+        this.model = model
+        this.binance = binance
+        this.coinbase = coinbase
+        this.okx = okx
+        this.ftx = ftx
+        this.kraken = kraken
     }
 }
 
@@ -56,7 +57,6 @@ export default class NearApi {
         await import('../utils/near-api-js.js')
         // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         const nearApi = (window as any).nearApi as any
-        console.log('this nearApi')
         console.log(nearApi)
         const config: ConnectConfig = {
             helperUrl: "https://helper.testnet.near.org",
@@ -76,9 +76,9 @@ export default class NearApi {
         const wallet = new nearApi.WalletConnection(near) as WalletConnection
         const contract: OracleContractT = new nearApi.Contract(
             wallet.account(),
-            "laov1.liv1.testnet",
+            "advo1.liv1.testnet",
             {
-                viewMethods: ["get_item"],
+                viewMethods: ["get_item", "all_keys"],
                 changeMethods: ["add_item"],
                 sender: wallet.account(),
             }
@@ -106,23 +106,27 @@ export default class NearApi {
         return await this.contract?.get_item({item_id})
     }
 
+    async getKeys(): Promise<string> {
+        return await this.contract?.all_keys()
+    }
+
     async addItem(item_id: string,
-                  direct: number,
-                  email: number,
-                  fb: number,
-                  g_search: number,
-                  organic: number,
-                  youtube: number,
+                  model: string,
+                  binance: number,
+                  coinbase: number,
+                  okx: number,
+                  ftx: number,
+                  kraken: number,
     ): Promise<void> {
         console.log('add item')
         return await this.contract?.add_item({
             item_id,
-            direct,
-            email,
-            fb,
-            g_search,
-            organic,
-            youtube,
+            model,
+            binance,
+            coinbase,
+            okx,
+            ftx,
+            kraken,
         })
     }
 }

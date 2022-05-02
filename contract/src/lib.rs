@@ -10,12 +10,11 @@ near_sdk::setup_alloc!();
 pub struct Channel {
     item_id: String,
     model: String,
-    direct: usize,
-    email: usize,
-    fb: usize,
-    g_search: usize,
-    organic: usize,
-    youtube: usize,
+    binance: usize,
+    coinbase: usize,
+    okx: usize,
+    ftx: usize,
+    kraken: usize,
 }
 
 #[near_bindgen]
@@ -35,22 +34,21 @@ impl Contract {
 
     pub fn add_item(&mut self,
                     item_id: String,
-                    direct: usize,
-                    email: usize,
-                    fb: usize,
-                    g_search: usize,
-                    organic: usize,
-                    youtube: usize,
+                    model: String,
+                    binance: usize,
+                    coinbase: usize,
+                    okx: usize,
+                    ftx: usize,
+                    kraken: usize,
     ) {
         self.adv_channel.insert(&item_id.clone(), &Channel {
             item_id,
-            model: "LastInteraction".to_string(),
-            direct,
-            email,
-            fb,
-            g_search,
-            organic,
-            youtube,
+            model,
+            binance,
+            coinbase,
+            okx,
+            ftx,
+            kraken,
         });
     }
 
@@ -61,6 +59,16 @@ impl Contract {
             }
             None => "not found".to_string()
         }
+    }
+
+    pub fn all_keys(&self) -> String {
+        let all_keys = self.adv_channel.keys_as_vector();
+        let mut res_string: String = "".into();
+        for k in all_keys.iter() {
+            let res_key = format!("{};", k);
+            res_string.push_str(&res_key);
+        }
+        res_string
     }
 
     pub fn get_item_oracle(&self) -> String {

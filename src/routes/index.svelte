@@ -6,13 +6,16 @@
   type ConnectionState = 'init' | 'disconnected' | 'connected'
   let isConnected: ConnectionState = 'init'
 
+  const random = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+
+  let allKeys = "not set"
   let item_id = "not set"
-  let direct = 0
-  let email = 0
-  let fb = 0
-  let g_search = 0
-  let organic = 0
-  let youtube = 0
+  let model = "not set"
+  let binance = 0
+  let coinbase = 0
+  let okx = 0
+  let ftx = 0
+  let kraken = 0
 
   let nearApi!: NearApi
   onMount(async () => {
@@ -41,36 +44,52 @@
     return nearApi.accountName()
   }
 
+  const randomFill = () => {
+    binance = random(8000, 20000)
+    coinbase = random(8000, 20000)
+    okx = random(8000, 20000)
+    ftx = random(8000, 20000)
+    kraken = random(8000, 20000)
+  }
+
+  const getAllKeys = async () => {
+    const res = await nearApi.getKeys()
+    console.log(`res: ${res}`)
+    if (res.length > 0) {
+      allKeys = res
+    }
+  }
+
   const getItem = async () => {
     const res = await nearApi.getItem(item_id)
     console.log(`res: ${res}`)
     if (res !== 'not found') {
       const val = JSON.parse(res) as {
         item_id: string,
-        direct: number,
-        email: number,
-        fb: number,
-        g_search: number,
-        organic: number,
-        youtube: number
+        model: string,
+        binance: number,
+        coinbase: number,
+        okx: number,
+        ftx: number,
+        kraken: number,
       }
       item_id = val.item_id
-      direct = val.direct
-      email = val.email
-      fb = val.fb
-      g_search = val.g_search
-      organic = val.organic
-      youtube = val.youtube
+      model = val.model
+      binance = val.binance
+      coinbase = val.coinbase
+      okx = val.okx
+      ftx = val.ftx
+      kraken = val.kraken
     }
   }
   const addItem = async () => {
     await nearApi.addItem(item_id,
-      direct,
-      email,
-      fb,
-      g_search,
-      organic,
-      youtube
+      model,
+      binance,
+      coinbase,
+      okx,
+      ftx,
+      kraken
     )
   }
 
@@ -87,16 +106,28 @@
   {/if}
 {/if}
 
+<h3>All keys</h3>
+{#if allKeys !== 'not set'}
+  all keys: {allKeys}
+{/if}<br/>
+<button on:click={getAllKeys}>Get item keys</button>
+
 {#if isConnected === 'connected'}
   <div class="form">
     <h3>Attribution models</h3>
+    <button on:click={randomFill}>Random</button>
     <Attribute attrId='item_id' attrType='text' bind:value={item_id}/>
-    <Attribute attrId='direct' attrType='number' bind:value={direct}/>
-    <Attribute attrId='email' attrType='number' bind:value={email}/>
-    <Attribute attrId='fb' attrType='number' bind:value={fb}/>
-    <Attribute attrId='g_search' attrType='number' bind:value={g_search}/>
-    <Attribute attrId='organic' attrType='number' bind:value={organic}/>
-    <Attribute attrId='youtube' attrType='number' bind:value={youtube}/>
+    <label for="advModel">Choose a model:</label>
+    <select name="model" id="advModel">
+      <option value="lastInteraction">Last Interaction</option>
+      <option value="firstInteraction">First Interaction</option>
+      <option value="markovChains">Markov Chains</option>
+    </select>
+    <Attribute attrId='Binance' attrType='number' bind:value={binance}/>
+    <Attribute attrId='Coinbase' attrType='number' bind:value={coinbase}/>
+    <Attribute attrId='Okx' attrType='number' bind:value={okx}/>
+    <Attribute attrId='Ftx' attrType='number' bind:value={ftx}/>
+    <Attribute attrId='Kraken' attrType='number' bind:value={kraken}/>
     <div style="display: flex; flex-direction: column; max-width: 10em; gap: 10px">
       <button on:click={getItem}>Get item</button>
       <button on:click={addItem}>Add items</button>

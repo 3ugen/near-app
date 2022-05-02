@@ -13,12 +13,11 @@ const NO_DEPOSIT: Balance = 0;
 pub struct Channel {
     item_id: String,
     model: String,
-    direct: usize,
-    email: usize,
-    fb: usize,
-    g_search: usize,
-    organic: usize,
-    youtube: usize,
+    binance: usize,
+    coinbase: usize,
+    okx: usize,
+    ftx: usize,
+    kraken: usize,
 }
 
 // define the methods we'll use on laov1
@@ -53,22 +52,21 @@ impl Contract {
 
     pub fn add_item(&mut self,
                     item_id: String,
-                    direct: usize,
-                    email: usize,
-                    fb: usize,
-                    g_search: usize,
-                    organic: usize,
-                    youtube: usize,
+                    model: String,
+                    binance: usize,
+                    coinbase: usize,
+                    okx: usize,
+                    ftx: usize,
+                    kraken: usize,
     ) {
         self.adv_channel.insert(&item_id.clone(), &Channel {
             item_id,
-            model: "LastInteraction".to_string(),
-            direct,
-            email,
-            fb,
-            g_search,
-            organic,
-            youtube,
+            model,
+            binance,
+            coinbase,
+            okx,
+            ftx,
+            kraken,
         });
     }
 
