@@ -13,11 +13,11 @@ const NO_DEPOSIT: Balance = 0;
 pub struct Channel {
     item_id: String,
     model: String,
-    binance: usize,
-    coinbase: usize,
-    okx: usize,
-    ftx: usize,
-    kraken: usize,
+    in_game_ad_clicks: usize,
+    google_links: usize,
+    pop_up_ads: usize,
+    video_ads: usize,
+    banner_ads: usize,
 }
 
 // define the methods we'll use on laov1
@@ -53,20 +53,20 @@ impl Contract {
     pub fn add_item(&mut self,
                     item_id: String,
                     model: String,
-                    binance: usize,
-                    coinbase: usize,
-                    okx: usize,
-                    ftx: usize,
-                    kraken: usize,
+                    in_game_ad_clicks: usize,
+                    google_links: usize,
+                    pop_up_ads: usize,
+                    video_ads: usize,
+                    banner_ads: usize,
     ) {
         self.adv_channel.insert(&item_id.clone(), &Channel {
             item_id,
             model,
-            binance,
-            coinbase,
-            okx,
-            ftx,
-            kraken,
+            in_game_ad_clicks,
+            google_links,
+            pop_up_ads,
+            video_ads,
+            banner_ads,
         });
     }
 

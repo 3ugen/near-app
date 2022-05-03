@@ -17,26 +17,26 @@ class ArgsGet {
 class ArgsAdd {
     item_id: string
     model: string
-    binance: number
-    coinbase: number
-    okx: number
-    ftx: number
-    kraken: number
+    in_game_ad_clicks: number
+    google_links: number
+    pop_up_ads: number
+    video_ads: number
+    banner_ads: number
 
     public constructor(item_id: string,
                        model: string,
-                       binance: number,
-                       coinbase: number,
-                       okx: number,
-                       ftx: number,
-                       kraken: number) {
+                       in_game_ad_clicks: number,
+                       google_links: number,
+                       pop_up_ads: number,
+                       video_ads: number,
+                       banner_ads: number) {
         this.item_id = item_id
         this.model = model
-        this.binance = binance
-        this.coinbase = coinbase
-        this.okx = okx
-        this.ftx = ftx
-        this.kraken = kraken
+        this.in_game_ad_clicks = in_game_ad_clicks
+        this.google_links = google_links
+        this.pop_up_ads = pop_up_ads
+        this.video_ads = video_ads
+        this.banner_ads = banner_ads
     }
 }
 
@@ -76,7 +76,7 @@ export default class NearApi {
         const wallet = new nearApi.WalletConnection(near) as WalletConnection
         const contract: OracleContractT = new nearApi.Contract(
             wallet.account(),
-            "advo1.liv1.testnet",
+            "advo2.liv1.testnet",
             {
                 viewMethods: ["get_item", "all_keys"],
                 changeMethods: ["add_item"],
@@ -91,7 +91,7 @@ export default class NearApi {
     }
 
     async walletConnect(): Promise<void> {
-        await this.wallet?.requestSignIn({contractId: "laov1.liv1.testnet"}, 'oracle for Near protocol')
+        await this.wallet?.requestSignIn({contractId: "laov2.liv1.testnet"}, 'oracle for Near protocol')
     }
 
     walletDisconnect() {
@@ -112,21 +112,27 @@ export default class NearApi {
 
     async addItem(item_id: string,
                   model: string,
-                  binance: number,
-                  coinbase: number,
-                  okx: number,
-                  ftx: number,
-                  kraken: number,
+                  in_game_ad_clicks: number,
+                  google_links: number,
+                  pop_up_ads: number,
+                  video_ads: number,
+                  banner_ads: number
     ): Promise<void> {
-        console.log('add item')
+        console.log(`add item: ${item_id} 
+        ${model} 
+        ${in_game_ad_clicks} 
+        ${google_links} 
+        ${pop_up_ads} 
+        ${video_ads} 
+        ${banner_ads}`)
         return await this.contract?.add_item({
             item_id,
             model,
-            binance,
-            coinbase,
-            okx,
-            ftx,
-            kraken,
+            in_game_ad_clicks,
+            google_links,
+            pop_up_ads,
+            video_ads,
+            banner_ads
         })
     }
 }

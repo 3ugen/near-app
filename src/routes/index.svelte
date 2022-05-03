@@ -1,7 +1,9 @@
 <script lang="ts">
   import {onMount} from "svelte"
-  import NearApi from "../libs/near-api";
-  import Attribute from "../components/Attribute.svelte";
+  import NearApi from "$lib/near-api";
+  import NavBar from "$components/NavBar.svelte";
+  import ItemKeys from "$components/ItemKeys.svelte";
+  import ModelForm from "$components/ModelForm.svelte";
 
   type ConnectionState = 'init' | 'disconnected' | 'connected'
   let isConnected: ConnectionState = 'init'
@@ -10,12 +12,12 @@
 
   let allKeys = "not set"
   let item_id = "not set"
-  let model = "not set"
-  let binance = 0
-  let coinbase = 0
-  let okx = 0
-  let ftx = 0
-  let kraken = 0
+  let model = "Last Interaction"
+  let in_game_ad_clicks = 0
+  let google_links = 0
+  let pop_up_ads = 0
+  let video_ads = 0
+  let banner_ads = 0
 
   let nearApi!: NearApi
   onMount(async () => {
@@ -45,11 +47,11 @@
   }
 
   const randomFill = () => {
-    binance = random(8000, 20000)
-    coinbase = random(8000, 20000)
-    okx = random(8000, 20000)
-    ftx = random(8000, 20000)
-    kraken = random(8000, 20000)
+    in_game_ad_clicks = random(8000, 20000)
+    google_links = random(8000, 20000)
+    pop_up_ads = random(8000, 20000)
+    video_ads = random(8000, 20000)
+    banner_ads = random(8000, 20000)
   }
 
   const getAllKeys = async () => {
@@ -67,80 +69,47 @@
       const val = JSON.parse(res) as {
         item_id: string,
         model: string,
-        binance: number,
-        coinbase: number,
-        okx: number,
-        ftx: number,
-        kraken: number,
+        in_game_ad_clicks: number,
+        google_links: number,
+        pop_up_ads: number,
+        video_ads: number,
+        banner_ads: number
       }
       item_id = val.item_id
       model = val.model
-      binance = val.binance
-      coinbase = val.coinbase
-      okx = val.okx
-      ftx = val.ftx
-      kraken = val.kraken
+      in_game_ad_clicks = val.in_game_ad_clicks
+      google_links = val.google_links
+      pop_up_ads = val.pop_up_ads
+      video_ads = val.video_ads
+      banner_ads = val.banner_ads
     }
   }
   const addItem = async () => {
     await nearApi.addItem(item_id,
       model,
-      binance,
-      coinbase,
-      okx,
-      ftx,
-      kraken
+      in_game_ad_clicks,
+      google_links,
+      pop_up_ads,
+      video_ads,
+      banner_ads
     )
   }
 
 </script>
-<h1>Adv Oracle for Near protocol</h1>
-<p>Connection state: {isConnected}</p>
-{#if isConnected !== 'init'}
-  {#if (isConnected === 'connected')}
-    <p>Account: {getAccountName()}</p>
-    <button on:click={walletDisconnect}>Disconnect</button>
+<NavBar isConnected={isConnected} getAccountName={getAccountName} walletConnect="{walletConnect}"
+        walletDisconnect="{walletDisconnect}"/>
 
-  {:else}
-    <button on:click={walletConnect}>Connect</button>
-  {/if}
-{/if}
-
-<h3>All keys</h3>
-{#if allKeys !== 'not set'}
-  all keys: {allKeys}
-{/if}<br/>
-<button on:click={getAllKeys}>Get item keys</button>
-
-{#if isConnected === 'connected'}
-  <div class="form">
-    <h3>Attribution models</h3>
-    <button on:click={randomFill}>Random</button>
-    <Attribute attrId='item_id' attrType='text' bind:value={item_id}/>
-    <label for="advModel">Choose a model:</label>
-    <select name="model" id="advModel">
-      <option value="lastInteraction">Last Interaction</option>
-      <option value="firstInteraction">First Interaction</option>
-      <option value="markovChains">Markov Chains</option>
-    </select>
-    <Attribute attrId='Binance' attrType='number' bind:value={binance}/>
-    <Attribute attrId='Coinbase' attrType='number' bind:value={coinbase}/>
-    <Attribute attrId='Okx' attrType='number' bind:value={okx}/>
-    <Attribute attrId='Ftx' attrType='number' bind:value={ftx}/>
-    <Attribute attrId='Kraken' attrType='number' bind:value={kraken}/>
-    <div style="display: flex; flex-direction: column; max-width: 10em; gap: 10px">
-      <button on:click={getItem}>Get item</button>
-      <button on:click={addItem}>Add items</button>
-    </div>
-  </div>
-{/if}
-
-<style>
-  .form {
-    display: flex;
-    flex-direction: column;
-    max-width: 300px;
-    gap: 15px;
-    margin-top: 30px
-  }
-</style>
+<ItemKeys isConnected={isConnected} allKeys="{allKeys}" getAllKeys="{getAllKeys}"/>
+<ModelForm
+  isConnected="{isConnected}"
+  bind:item_id={item_id}
+  bind:model="{model}"
+  bind:in_game_ad_clicks={in_game_ad_clicks}
+  bind:google_links={google_links}
+  bind:pop_up_ads={pop_up_ads}
+  bind:video_ads={video_ads}
+  bind:banner_ads={banner_ads}
+  randomFill={randomFill}
+  getItem={getItem}
+  addItem={addItem}
+/>
