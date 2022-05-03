@@ -91,7 +91,7 @@ export default class NearApi {
     }
 
     async walletConnect(): Promise<void> {
-        await this.wallet?.requestSignIn({contractId: "laov2.liv1.testnet"}, 'oracle for Near protocol')
+        await this.wallet?.requestSignIn({contractId: "advo2.liv1.testnet"}, 'oracle for Near protocol')
     }
 
     walletDisconnect() {
