@@ -18,6 +18,7 @@
   export let getItem
   export let addItem
   export let addItemRubicon
+  export let getItemRubicon
   let modelOptions = [
     {id: 0, text: "Video Ads"},
     {id: 1, text: "Android Ads"},
@@ -76,7 +77,7 @@
 
       <button class="btn-primary" on:click={getItem}>Submit the Bid</button>
       <button class="btn-primary" on:click={addItemRubicon}>Generate JSON Request</button>
-      <button class="btn-primary" on:click={getItem}>Generate JSON Response</button>
+      <button class="btn-primary" on:click={getItemRubicon}>Generate JSON Response</button>
     </div>
   </div>
 {/if}

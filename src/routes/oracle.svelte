@@ -5,6 +5,7 @@
   import ItemKeys from "$components/ItemKeys.svelte";
   import ModelForm from "$components/ModelFormBidTemplate.svelte";
   import {random} from "$utils/utils";
+  import Debugger from 'svelte-debugger';
 
   import {
     adname,
@@ -114,6 +115,7 @@
     }
   }
 
+
   const getItem = async () => {
     const res = await nearApi.getItem(item_id)
     console.log(`res: ${res}`)
@@ -139,6 +141,18 @@
       c234 = val.shapley_value.c234
       c345 = val.shapley_value.c345
     }
+  }
+
+  const getItemRubicon = async () => {
+    const res = await nearApi.getItem(item_id)
+    console.log(`res rubicon: ${res}`)
+    if (res !== 'not found') {
+      const val = JSON.parse(res) as any
+      console.table(val)
+      jsonResponse = JSON.stringify(val)
+      tabId = 1
+    }
+
   }
   const addItemRubicon = async () => {
     console.log(`oracle: ${adnameValue}; ${bidPriceValue}`)
@@ -170,14 +184,14 @@
     let geo = {
       country: "USA",
       region: "PA",
-      type: 3,
+      tp: 3,
       ext: extGeo
     }
     let extUser = {
       sessiondepth: 207
     }
     let rubicon = {
-      id: "123",
+      id: item_id,
       at: 2,
       tmax: 123,
       imp: [impItem],
@@ -207,7 +221,7 @@
       },
       user: {
         id: "bd5adc55dcbab4bf090604df4f543d90b09f0c88",
-        extUser: extUser
+        ext: extUser
       }
     }
     let channel = JSON.stringify(rubicon)
@@ -231,28 +245,87 @@
       c345,
     )
   }
+
+  const handleClick = () => {
+    alert(
+      "Your Bid is is accepted. The Page will be redirected to Payment Portal"
+    );
+  }
+
+  let tabId = 0
+
+  let jsonResponse = ""
 </script>
 <NavBar isConnected={isConnected} getAccountName={getAccountName} walletConnect="{walletConnect}"
         walletDisconnect="{walletDisconnect}"/>
 
-<ModelForm
-  isConnected="{isConnected}"
-  bind:item_id="{item_id}"
-  bind:fi_in_game_ad_clicks={fi_in_game_ad_clicks}
-  bind:fi_google_links={fi_google_links}
-  bind:fi_pop_up_ads={fi_pop_up_ads}
-  bind:fi_video_ads={fi_video_ads}
-  bind:fi_banner_ads={fi_banner_ads}
-  bind:li_in_game_ad_clicks={li_in_game_ad_clicks}
-  bind:li_google_links={li_google_links}
-  bind:li_pop_up_ads={li_pop_up_ads}
-  bind:li_video_ads={li_video_ads}
-  bind:li_banner_ads={li_banner_ads}
-  bind:c123={c123}
-  bind:c234={c234}
-  bind:c345={c345}
-  randomFill={randomFill}
-  getItem={getItem}
-  addItem={addItem}
-  addItemRubicon={addItemRubicon}
-/>
+<ItemKeys isConnected={isConnected} allKeys="{allKeys}" getAllKeys="{getAllKeys}"/>
+
+<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400
+  dark:border-gray-700">
+  <ul class="flex flex-wrap -mb-px">
+    <li class="mr-2">
+      <button
+        on:click={() => {tabId = 0}}
+        class="{tabId === 0 ? 'selected' : 'default'}"
+        aria-current="page">Request
+      </button>
+    </li>
+    <li class="mr-2">
+      <button
+        on:click={() => {tabId = 1}}
+        class="{tabId === 1 ? 'selected' : 'default'}"
+        aria-current="page">Response
+      </button>
+    </li>
+  </ul>
+</div>
+{#if tabId === 0}
+  <ModelForm
+    isConnected="{isConnected}"
+    bind:item_id="{item_id}"
+    bind:fi_in_game_ad_clicks={fi_in_game_ad_clicks}
+    bind:fi_google_links={fi_google_links}
+    bind:fi_pop_up_ads={fi_pop_up_ads}
+    bind:fi_video_ads={fi_video_ads}
+    bind:fi_banner_ads={fi_banner_ads}
+    bind:li_in_game_ad_clicks={li_in_game_ad_clicks}
+    bind:li_google_links={li_google_links}
+    bind:li_pop_up_ads={li_pop_up_ads}
+    bind:li_video_ads={li_video_ads}
+    bind:li_banner_ads={li_banner_ads}
+    bind:c123={c123}
+    bind:c234={c234}
+    bind:c345={c345}
+    randomFill={randomFill}
+    getItem={handleClick}
+    addItem={handleClick}
+    addItemRubicon={addItemRubicon}
+    getItemRubicon={getItemRubicon}
+  />
+{:else}
+  {#if jsonResponse.length === 0}
+    <p>not set</p>
+  {:else}
+    <Debugger
+      data={JSON.parse(jsonResponse)}
+      indent={2}
+      colorOptions={{ falseColor: '#ff3e00', trueColor: '#40b3ff' }}
+    />
+    {jsonResponse}
+  {/if}
+{/if}
+
+<style lang="postcss">
+  .selected {
+    @apply inline-block p-4 text-blue-600 rounded-t-lg border-b-2 border-blue-600 dark:text-blue-500 dark:border-blue-500
+  }
+
+  .default {
+    @apply inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+  }
+</style>
+
+
+
+

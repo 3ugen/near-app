@@ -22,7 +22,7 @@ pub struct Banner {
 pub struct Imp {
     id: String,
     tagid: String,
-    ifamebuster: Vec<String>,
+    iframebuster: Vec<String>,
     banner: Banner,
 }
 // **************************************
@@ -75,15 +75,15 @@ pub struct Device {
     model: String,
     os: String,
     osv: String,
+    ua: String,
     ip: String,
     language: String,
     devicetype: usize,
     js: usize,
     connectiontype: usize,
-    ua: usize,
     dpidsha1: String,
     carrier: String,
-    geo: Publisher,
+    geo: Geo,
 }
 
 // **************************************
@@ -104,8 +104,8 @@ pub struct User {
 #[serde(crate = "near_sdk::serde")]
 pub struct Channel {
     id: String,
-    at: String,
-    tmax: String,
+    at: usize,
+    tmax: usize,
     imp: Vec<Imp>,
     app: App,
     device: Device,
