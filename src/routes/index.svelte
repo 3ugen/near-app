@@ -1,163 +1,103 @@
 <script lang="ts">
-  import {onMount} from "svelte"
-  import NearApi from "$lib/near-api";
-  import NavBar from "$components/NavBar.svelte";
-  import ItemKeys from "$components/ItemKeys.svelte";
-  import ModelForm from "$components/ModelForm.svelte";
-  import {random} from "$utils/utils";
+  import logo from '$assets/images/logo-locify_black.png'
 
-  type ConnectionState = 'init' | 'disconnected' | 'connected'
-  type AttributesT = {
-    in_game_ad_clicks: number
-    google_links: number
-    pop_up_ads: number
-    video_ads: number
-    banner_ads: number
-  }
-  type CombinationsT = {
-    c123: number
-    c234: number
-    c345: number
-  }
-  let isConnected: ConnectionState = 'init'
+  export const router = false;
+  import {browser} from '$app/env'
+  import {goto} from '$app/navigation'
 
-  const minVal = 8000
-  const maxVal = 20000
-  let allKeys = "not set"
-  let item_id = "not set"
-  let model = "First Interaction"
-  let fi_in_game_ad_clicks = random(minVal, maxVal)
-  let fi_google_links = random(minVal, maxVal)
-  let fi_pop_up_ads = random(minVal, maxVal)
-  let fi_video_ads = random(minVal, maxVal)
-  let fi_banner_ads = random(minVal, maxVal)
-  let li_in_game_ad_clicks = random(minVal, maxVal)
-  let li_google_links = random(minVal, maxVal)
-  let li_pop_up_ads = random(minVal, maxVal)
-  let li_video_ads = random(minVal, maxVal)
-  let li_banner_ads = random(minVal, maxVal)
-  let c123 = random(minVal, maxVal)
-  let c234 = random(minVal, maxVal)
-  let c345 = random(minVal, maxVal)
+  let email = "";
+  let password = "";
 
-  let nearApi!: NearApi
-  onMount(async () => {
-    nearApi = await NearApi.init()
-    checkConnection()
-  })
+  let isLoading = false;
 
-  function checkConnection() {
-    if (nearApi.isConnected()) {
-      isConnected = 'connected'
-    } else {
-      isConnected = 'disconnected'
-    }
-    console.log(isConnected)
-  }
+  let isSuccess = false;
 
-  const walletConnect = async () => {
-    await nearApi.walletConnect()
-  }
-  const walletDisconnect = () => {
-    nearApi.walletDisconnect()
-    checkConnection()
-  }
+  export let submit;
 
-  function getAccountName(): string {
-    return nearApi.accountName()
-  }
+  let errors = {};
 
-  const randomFill = () => {
-    fi_in_game_ad_clicks = random(minVal, maxVal)
-    fi_google_links = random(minVal, maxVal)
-    fi_pop_up_ads = random(minVal, maxVal)
-    fi_video_ads = random(minVal, maxVal)
-    fi_banner_ads = random(minVal, maxVal)
-    li_in_game_ad_clicks = random(minVal, maxVal)
-    li_google_links = random(minVal, maxVal)
-    li_pop_up_ads = random(minVal, maxVal)
-    li_video_ads = random(minVal, maxVal)
-    li_banner_ads = random(minVal, maxVal)
-    c123 = random(minVal, maxVal)
-    c234 = random(minVal, maxVal)
-    c345 = random(minVal, maxVal)
-  }
-
-  const getAllKeys = async () => {
-    const res = await nearApi.getKeys()
-    console.log(`res: ${res}`)
-    if (res.length > 0) {
-      allKeys = res
+  let onSubmit = async () => {
+    if (browser) {
+      await goto('oracle')
     }
   }
 
-  const getItem = async () => {
-    const res = await nearApi.getItem(item_id)
-    console.log(`res: ${res}`)
-    if (res !== 'not found') {
-      const val = JSON.parse(res) as {
-        item_id: string,
-        first_interaction: AttributesT,
-        last_interaction: AttributesT,
-        shapley_value: CombinationsT
-      }
-      item_id = val.item_id
-      fi_in_game_ad_clicks = val.first_interaction.in_game_ad_clicks
-      fi_google_links = val.first_interaction.google_links
-      fi_pop_up_ads = val.first_interaction.pop_up_ads
-      fi_video_ads = val.first_interaction.video_ads
-      fi_banner_ads = val.first_interaction.banner_ads
-      li_in_game_ad_clicks = val.last_interaction.in_game_ad_clicks
-      li_google_links = val.last_interaction.google_links
-      li_pop_up_ads = val.last_interaction.pop_up_ads
-      li_video_ads = val.last_interaction.video_ads
-      li_banner_ads = val.last_interaction.banner_ads
-      c123 = val.shapley_value.c123
-      c234 = val.shapley_value.c234
-      c345 = val.shapley_value.c345
-    }
-  }
-  const addItem = async () => {
-    await nearApi.addItem(
-      item_id,
-      fi_in_game_ad_clicks,
-      fi_google_links,
-      fi_pop_up_ads,
-      fi_video_ads,
-      fi_banner_ads,
-      li_in_game_ad_clicks,
-      li_google_links,
-      li_pop_up_ads,
-      li_video_ads,
-      li_banner_ads,
-      c123,
-      c234,
-      c345,
-    )
-  }
+  const handleSubmit = () => {
+    errors = {};
 
+    if (email.length === 0) {
+      errors.email = "Field should not be empty";
+    }
+    if (password.length === 0) {
+      errors.password = "Field should not be empty";
+    }
+
+    if (Object.keys(errors).length === 0) {
+      isLoading = true;
+      submit({email, password})
+        .then(() => {
+          isSuccess = true;
+          isLoading = false;
+        })
+        .catch(err => {
+          errors.server = err;
+          isLoading = false;
+        });
+    }
+  };
 </script>
-<NavBar isConnected={isConnected} getAccountName={getAccountName} walletConnect="{walletConnect}"
-        walletDisconnect="{walletDisconnect}"/>
 
-<ItemKeys isConnected={isConnected} allKeys="{allKeys}" getAllKeys="{getAllKeys}"/>
-<ModelForm
-  isConnected="{isConnected}"
-  bind:item_id="{item_id}"
-  bind:fi_in_game_ad_clicks={fi_in_game_ad_clicks}
-  bind:fi_google_links={fi_google_links}
-  bind:fi_pop_up_ads={fi_pop_up_ads}
-  bind:fi_video_ads={fi_video_ads}
-  bind:fi_banner_ads={fi_banner_ads}
-  bind:li_in_game_ad_clicks={li_in_game_ad_clicks}
-  bind:li_google_links={li_google_links}
-  bind:li_pop_up_ads={li_pop_up_ads}
-  bind:li_video_ads={li_video_ads}
-  bind:li_banner_ads={li_banner_ads}
-  bind:c123={c123}
-  bind:c234={c234}
-  bind:c345={c345}
-  randomFill={randomFill}
-  getItem={getItem}
-  addItem={addItem}
-/>
+<div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div>
+      <img class="mx-auto h-12 w-auto" src="{logo}"
+           alt="Workflow">
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+    </div>
+    <form class="mt-8 space-y-6" on:submit|preventDefault={onSubmit}>
+      <input type="hidden" name="remember" value="true">
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div>
+          <label for="email-address" class="sr-only">Email address</label>
+          <input id="email-address" name="email" type="email" autocomplete="email" required
+                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                 placeholder="Email address">
+        </div>
+        <div>
+          <label for="password" class="sr-only">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required
+                 class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                 placeholder="Password">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <input id="remember-me" name="remember-me" type="checkbox"
+                 class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+          <label for="remember-me" class="ml-2 block text-sm text-gray-900"> Remember me </label>
+        </div>
+
+        <div class="text-sm">
+          <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500"> Forgot your password? </a>
+        </div>
+      </div>
+
+      <div>
+        <button type="submit"
+                class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <!-- Heroicon name: solid/lock-closed -->
+            <svg class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clip-rule="evenodd"/>
+            </svg>
+          </span>
+          Sign in
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

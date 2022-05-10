@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ./build.sh && \
-export NEAR_ACCT=advo3.liv1.testnet && \
-#near delete $NEAR_ACCT liv1.testnet && \
+export NEAR_ACCT=advo4.liv1.testnet && \
+near delete $NEAR_ACCT liv1.testnet && \
 sleep 1 && \
 near create-account $NEAR_ACCT --masterAccount liv1.testnet --initialBalance 10 && \
 sleep 1 && \

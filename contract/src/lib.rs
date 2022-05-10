@@ -5,31 +5,111 @@ use near_sdk::serde::{Serialize, Deserialize};
 
 near_sdk::setup_alloc!();
 
+// **************************************
 #[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
-pub struct Combinations {
-    c123: usize,
-    c234: usize,
-    c345: usize,
+pub struct Banner {
+    w: usize,
+    h: usize,
+    pos: usize,
+    battr: Vec<usize>,
+    api: Vec<usize>,
+    topframe: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
-pub struct Attributes {
-    in_game_ad_clicks: usize,
-    google_links: usize,
-    pop_up_ads: usize,
-    video_ads: usize,
-    banner_ads: usize,
+pub struct Imp {
+    id: String,
+    tagid: String,
+    ifamebuster: Vec<String>,
+    banner: Banner,
+}
+// **************************************
+
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct Publisher {
+    id: String,
 }
 
-#[derive(Debug, Serialize, BorshDeserialize, BorshSerialize)]
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct Ext {
+    storerating: usize,
+    appstoreid: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct App {
+    id: String,
+    cat: Vec<String>,
+    name: String,
+    domain: String,
+    privacypolicy: usize,
+    publisher: Publisher,
+    ext: Ext,
+}
+
+// **************************************
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct ExtDevice {
+    latlonconsent: usize,
+}
+
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct Geo {
+    country: String,
+    region: String,
+    tp: usize,
+    ext: ExtDevice,
+}
+
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct Device {
+    make: String,
+    model: String,
+    os: String,
+    osv: String,
+    ip: String,
+    language: String,
+    devicetype: usize,
+    js: usize,
+    connectiontype: usize,
+    ua: usize,
+    dpidsha1: String,
+    carrier: String,
+    geo: Publisher,
+}
+
+// **************************************
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct ExtUser {
+    sessiondepth: usize,
+}
+
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct User {
+    id: String,
+    ext: ExtUser,
+}
+
+#[derive(Debug, Serialize, Deserialize, BorshDeserialize, BorshSerialize)]
 #[serde(crate = "near_sdk::serde")]
 pub struct Channel {
-    item_id: String,
-    first_interaction: Attributes,
-    last_interaction: Attributes,
-    shapley_value: Combinations,
+    id: String,
+    at: String,
+    tmax: String,
+    imp: Vec<Imp>,
+    app: App,
+    device: Device,
+    user: User,
 }
 
 #[near_bindgen]
@@ -47,21 +127,11 @@ impl Contract {
         }
     }
 
-    pub fn add_item(&mut self,
-                    item_id: String,
-                    first_interaction: String,
-                    last_interaction: String,
-                    shapley_value: String,
+    pub fn add_item_rubicon(&mut self,
+                            channel: String,
     ) {
-        let first_interaction: Attributes = serde_json::from_slice(first_interaction.as_bytes()).unwrap();
-        let last_interaction: Attributes = serde_json::from_slice(last_interaction.as_bytes()).unwrap();
-        let shapley_value: Combinations = serde_json::from_slice(shapley_value.as_bytes()).unwrap();
-        self.adv_channel.insert(&item_id.clone(), &Channel {
-            item_id,
-            first_interaction,
-            last_interaction,
-            shapley_value,
-        });
+        let channel: Channel = serde_json::from_slice(channel.as_ref()).unwrap();
+        self.adv_channel.insert(&channel.id.clone(), &channel);
     }
 
     pub fn get_item(&self, item_id: String) -> String {

@@ -1,9 +1,11 @@
 import type {ConnectConfig, Contract, Near, WalletConnection} from "near-api-js";
 
+
 type OracleContractT = Contract & {
     get_item(arg0: ArgsGet): Promise<string>,
     all_keys(): Promise<string>,
     add_item(arg0: ArgsAdd): Promise<void>,
+    add_item_rubicon(arg0: ArgsAddRubicon): Promise<void>,
 }
 
 class ArgsGet {
@@ -11,6 +13,14 @@ class ArgsGet {
 
     public constructor(item_id: string) {
         this.item_id = item_id;
+    }
+}
+
+class ArgsAddRubicon {
+    channel: string
+
+    public constructor(channel: string) {
+        this.channel = channel
     }
 }
 
@@ -68,10 +78,10 @@ export default class NearApi {
         const wallet = new nearApi.WalletConnection(near) as WalletConnection
         const contract: OracleContractT = new nearApi.Contract(
             wallet.account(),
-            "advo3.liv1.testnet",
+            "advo4.liv1.testnet",
             {
                 viewMethods: ["get_item", "all_keys"],
-                changeMethods: ["add_item"],
+                changeMethods: ["add_item_rubicon"],
                 sender: wallet.account(),
             }
         )
@@ -83,7 +93,7 @@ export default class NearApi {
     }
 
     async walletConnect(): Promise<void> {
-        await this.wallet?.requestSignIn({contractId: "advo3.liv1.testnet"}, 'oracle for Near protocol')
+        await this.wallet?.requestSignIn({contractId: "advo4.liv1.testnet"}, 'oracle for Near protocol')
     }
 
     walletDisconnect() {
@@ -100,6 +110,11 @@ export default class NearApi {
 
     async getKeys(): Promise<string> {
         return await this.contract?.all_keys()
+    }
+
+    async addItemRubicon(channel: string): Promise<void> {
+        console.log(`rubicon string: ${channel}`)
+        return await this.contract?.add_item_rubicon({channel})
     }
 
     async addItem(

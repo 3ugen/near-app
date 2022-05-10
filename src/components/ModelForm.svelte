@@ -72,10 +72,14 @@
         {/if}
       </div>
       <div class="py-4 px-2 flex flex-row justify-between">
-        <button class="btn-primary" on:click={getItem}>Get item</button>
+        <!--<button class="btn-primary" on:click={getItem}>Get item</button>
         <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
                 on:click={addItem}>Add items
-        </button>
+        </button>-->
+
+        <button class="btn-primary" on:click={getItem}>Submit the Bid</button>
+        <button class="btn-primary" on:click={getItem}>Generate the Bid</button>
+        <button class="btn-primary" on:click={getItem}>Generate the Bid</button>
       </div>
     </div>
   </div>
