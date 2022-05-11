@@ -9,6 +9,7 @@
     title,
     pname,
     gaming,
+    tmpl
   } from '$stores/store';
 
   export let isConnected
@@ -16,18 +17,28 @@
 
   export let randomFill
   export let getItem
-  export let addItem
-  export let addItemRubicon
-  export let getItemRubicon
   let modelOptions = [
     {id: 0, text: "Video Ads"},
     {id: 1, text: "Android Ads"},
     {id: 2, text: "iOS Ads"},
   ]
   let selected = modelOptions[0]
+
+  const handleSelect = () => {
+    tmpl.update(() => selected.text)
+  }
+
+  function formatStr(n: number): string {
+    if (n < 10) {
+      return '0' + n.toString()
+    } else {
+      return n.toString()
+    }
+  }
+
   const currentTime = () => {
     let dt = new Date()
-    return `${dt.getHours()}:${dt.getMinutes()}`
+    return `${formatStr(dt.getDate())}-${formatStr(dt.getMonth())}-${formatStr(dt.getFullYear())}`
   };
 </script>
 {#if isConnected === 'connected'}
@@ -41,7 +52,7 @@
         <Attribute attrId='Advertisor Name' attrType='text' bind:value={$adname}/>
         <label class="block">
           <span class="text-gray-700">Template option:</span>
-          <select class="form-select block w-full mt-1" bind:value={selected}>
+          <select class="form-select block w-full mt-1" bind:value={selected} on:click={handleSelect}>
             <option value={modelOptions[0]}>
               {modelOptions[0].text}
             </option>
@@ -60,24 +71,12 @@
         </label>
         <Attribute attrId='Minimum Bid Floor' attrType='number' bind:value={$bidprice}/>
         <Attribute attrId='Crypto Protocol' attrType='text' bind:value={$cryptotype}/>
-        <Attribute attrId='File Name' attrType='text' bind:value={$tagname}/>
-        <Attribute attrId='Tag Name' attrType='text' bind:value={$title}/>
-        <Attribute attrId='Select a Title' attrType='text' bind:value={$pname}/>
-        <Attribute attrId='Publisher Name' attrType='text' bind:value={$gaming}/>
+        <Attribute attrId='File Name' attrType='text' bind:value={$filename}/>
+        <Attribute attrId='Tag Name' attrType='text' bind:value={$tagname}/>
+        <Attribute attrId='Select a Title' attrType='text' bind:value={$title}/>
+        <Attribute attrId='Publisher Name' attrType='text' bind:value={$pname}/>
         <Attribute attrId='Domain Name' attrType='text' bind:value={$gaming}/>
-
       </div>
-
-    </div>
-    <div class="py-4 px-2 flex flex-row justify-between">
-      <!--<button class="btn-primary" on:click={getItem}>Get item</button>
-      <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
-              on:click={addItem}>Add items
-      </button>-->
-
-      <button class="btn-primary" on:click={getItem}>Submit the Bid</button>
-      <button class="btn-primary" on:click={addItemRubicon}>Generate JSON Request</button>
-      <button class="btn-primary" on:click={getItemRubicon}>Generate JSON Response</button>
     </div>
   </div>
 {/if}

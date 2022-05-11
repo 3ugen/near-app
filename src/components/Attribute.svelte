@@ -24,7 +24,7 @@
         class="form-input mt-1 block w-full"
         placeholder="insert value"
         bind:value={value}
-        min=1000 max=20000
+        min=1 max=100
       />
     </label>
   {/if}

@@ -8,3 +8,4 @@ export const tagname = writable<string>('tagname');
 export const title = writable<string>('title');
 export const pname = writable<string>('pname');
 export const gaming = writable<string>('gaming');
+export const tmpl = writable<string>('Video Ads');

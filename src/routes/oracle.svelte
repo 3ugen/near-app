@@ -15,7 +15,7 @@
     tagname,
     title,
     pname,
-    gaming,
+    gaming, tmpl,
   } from '../stores/store';
 
 
@@ -69,6 +69,39 @@
     console.log(`subscribe bid: ${value}`)
     bidPriceValue = value
   })
+  let tmplValue
+  let makeVal = 'pc'
+  let modelVal = ""
+  let osVal = "Intel Mac OS"
+  let osvVal = "X 10_6_8"
+  let uaVal = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.59.10 (KHTML, like Gecko) Version/5.1.9 Safari/534.59.10"
+  tmpl
+    .subscribe(value => {
+      console.log(`subscribe tmpl: ${value}`)
+      tmplValue = value
+      switch (tmplValue) {
+        case 'Android Ads': {
+          makeVal = "Samsung"
+          modelVal = "SCH-I535"
+          osVal = "Android"
+          osvVal = "4.3"
+          uaVal = "Mozilla/5.0 (Linux; U; Android 4.3; en-us; SCH-I535 Build/JSS15J) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+          break
+        }
+        case 'iOS Ads': {
+          makeVal = "Apple"
+          modelVal = "iPhone"
+          osVal = "iOS"
+          osvVal = "7.0"
+          uaVal = "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) GSA/3.2.0.25255 Mobile/11A465 Safari/8536.25"
+          break
+        }
+        default: {
+          break
+        }
+
+      }
+    })
 
   function checkConnection() {
     if (nearApi.isConnected()) {
@@ -205,11 +238,11 @@
         ext: extApp
       },
       device: {
-        make: "Samsung",
-        model: "SCH-I535",
-        os: "Android",
-        osv: "4.3",
-        ua: "Mozilla/5.0 (Linux; U; Android 4.3; en-us; SCH-I535 Build/JSS15J) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+        make: makeVal,
+        model: modelVal,
+        os: osVal,
+        osv: osvVal,
+        ua: uaVal,
         ip: "192.168.1.1",
         language: "en",
         devicetype: 1,
@@ -248,7 +281,7 @@
 
   const handleClick = () => {
     alert(
-      "Your Bid is is accepted. The Page will be redirected to Payment Portal"
+      "Your Bid is is accepted. Click on Complete Payment to complete the process"
     );
   }
 
@@ -281,28 +314,39 @@
   </ul>
 </div>
 {#if tabId === 0}
-  <ModelForm
-    isConnected="{isConnected}"
-    bind:item_id="{item_id}"
-    bind:fi_in_game_ad_clicks={fi_in_game_ad_clicks}
-    bind:fi_google_links={fi_google_links}
-    bind:fi_pop_up_ads={fi_pop_up_ads}
-    bind:fi_video_ads={fi_video_ads}
-    bind:fi_banner_ads={fi_banner_ads}
-    bind:li_in_game_ad_clicks={li_in_game_ad_clicks}
-    bind:li_google_links={li_google_links}
-    bind:li_pop_up_ads={li_pop_up_ads}
-    bind:li_video_ads={li_video_ads}
-    bind:li_banner_ads={li_banner_ads}
-    bind:c123={c123}
-    bind:c234={c234}
-    bind:c345={c345}
-    randomFill={randomFill}
-    getItem={handleClick}
-    addItem={handleClick}
-    addItemRubicon={addItemRubicon}
-    getItemRubicon={getItemRubicon}
-  />
+  <div class="flex flex-wrap justify-center">
+    <ModelForm
+      isConnected="{isConnected}"
+      bind:item_id="{item_id}"
+      bind:fi_in_game_ad_clicks={fi_in_game_ad_clicks}
+      bind:fi_google_links={fi_google_links}
+      bind:fi_pop_up_ads={fi_pop_up_ads}
+      bind:fi_video_ads={fi_video_ads}
+      bind:fi_banner_ads={fi_banner_ads}
+      bind:li_in_game_ad_clicks={li_in_game_ad_clicks}
+      bind:li_google_links={li_google_links}
+      bind:li_pop_up_ads={li_pop_up_ads}
+      bind:li_video_ads={li_video_ads}
+      bind:li_banner_ads={li_banner_ads}
+      bind:c123={c123}
+      bind:c234={c234}
+      bind:c345={c345}
+      randomFill={randomFill}
+      getItem={handleClick}
+      addItem={handleClick}
+      addItemRubicon={addItemRubicon}
+      getItemRubicon={getItemRubicon}
+    />
+  </div>
+  <div class="flex flex-wrap justify-between">
+    <button class="btn-primary" on:click={getItem}>Submit the Bid</button>
+    <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
+            on:click={addItemRubicon}>Complete Payment
+    </button>
+    <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
+            on:click={getItemRubicon}>Generate JSON Response
+    </button>
+  </div>
 {:else}
   {#if jsonResponse.length === 0}
     <p>not set</p>
