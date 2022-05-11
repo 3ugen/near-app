@@ -6,6 +6,7 @@
   import ModelForm from "$components/ModelFormBidTemplate.svelte";
   import {random} from "$utils/utils";
   import Debugger from 'svelte-debugger';
+  import Big from 'big.js';
 
   import {
     adname,
@@ -34,6 +35,8 @@
   }
   let isConnected: ConnectionState = 'init'
 
+  let fName
+  filename.subscribe(value => fName = value)
   const minVal = 8000
   const maxVal = 20000
   let allKeys = "not set"
@@ -102,6 +105,21 @@
 
       }
     })
+
+  let cryptotypeVal
+  cryptotype.subscribe(value => cryptotypeVal = value)
+
+  let tagnameVal
+  tagname.subscribe(value => tagnameVal = value)
+
+  let titleVal
+  title.subscribe(value => titleVal = value)
+
+  let pnameVal
+  pname.subscribe(value => pnameVal = value)
+
+  let gamingVal
+  gaming.subscribe(value => gamingVal = value)
 
   function checkConnection() {
     if (nearApi.isConnected()) {
@@ -185,7 +203,13 @@
       jsonResponse = JSON.stringify(val)
       tabId = 1
     }
+  }
 
+  const completePayment = async () => {
+    const ATTACHED_TOKENS = Big(0)
+      .times(10 ** 24)
+      .toFixed(); // NEAR --> yoctoNEAR conversion
+    await nearApi.completePayment(item_id, ATTACHED_TOKENS)
   }
   const addItemRubicon = async () => {
     console.log(`oracle: ${adnameValue}; ${bidPriceValue}`)
@@ -223,8 +247,24 @@
     let extUser = {
       sessiondepth: 207
     }
+    const ATTACHED_GAS = Big(1)
+      .times(10 ** 16)
+      .toFixed(); // NEAR --> 10k picoNEAR conversion
+    const ATTACHED_TOKENS = Big(0)
+      .times(10 ** 24)
+      .toFixed(); // NEAR --> yoctoNEAR conversion
     let rubicon = {
       id: item_id,
+      adname: adnameValue,
+      bidprice: bidPriceValue,
+      cryptotype: cryptotypeVal,
+      filename: fName,
+      tagname: tagnameVal,
+      title: titleVal,
+      pname: pnameVal,
+      gaming: gamingVal,
+      tmpl: tmplValue,
+      payment: ATTACHED_TOKENS,
       at: 2,
       tmax: 123,
       imp: [impItem],
@@ -339,9 +379,11 @@
     />
   </div>
   <div class="flex flex-wrap justify-between">
-    <button class="btn-primary" on:click={getItem}>Submit the Bid</button>
     <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
-            on:click={addItemRubicon}>Complete Payment
+            on:click={addItemRubicon}>Submit the Bid
+    </button>
+    <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
+            on:click={completePayment}>Complete Payment
     </button>
     <button class="{(item_id.length === 0 || item_id === 'not set') ? 'btn-disabled' : 'btn-primary'}"
             on:click={getItemRubicon}>Generate JSON Response

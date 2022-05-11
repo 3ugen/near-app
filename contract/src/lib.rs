@@ -1,7 +1,10 @@
-use near_sdk::{near_bindgen, PanicOnDefault, serde_json};
+use near_sdk::{AccountId, Balance, env, near_bindgen, PanicOnDefault, Promise, serde_json};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
 use near_sdk::collections::UnorderedMap;
+use near_sdk::json_types::ValidAccountId;
 use near_sdk::serde::{Serialize, Deserialize};
+
+const MIN_ATTACHED_DEPOSIT: u128 = 100_000_000_000_000_000_000_000;
 
 near_sdk::setup_alloc!();
 
@@ -104,6 +107,16 @@ pub struct User {
 #[serde(crate = "near_sdk::serde")]
 pub struct Channel {
     id: String,
+    adname: String,
+    bidprice: usize,
+    cryptotype: String,
+    filename: String,
+    tagname: String,
+    title: String,
+    pname: String,
+    gaming: String,
+    tmpl: String,
+    payment: String,
     at: usize,
     tmax: usize,
     imp: Vec<Imp>,
@@ -115,17 +128,39 @@ pub struct Channel {
 #[near_bindgen]
 #[derive(PanicOnDefault, BorshDeserialize, BorshSerialize)]
 pub struct Contract {
+    owner_id: AccountId,
     adv_channel: UnorderedMap<String, Channel>,
 }
 
 #[near_bindgen]
 impl Contract {
     #[init]
-    pub fn init() -> Self {
+    pub fn init(owner_id: ValidAccountId) -> Self {
+        assert!(!env::state_exists(), "Already initialized");
         Self {
-            adv_channel: UnorderedMap::new(b'a')
+            owner_id: owner_id.into(),
+            adv_channel: UnorderedMap::new(b'a'),
         }
     }
+
+    #[payable]
+    pub fn payment(&mut self, item_id: String) {
+        let deposit = env::attached_deposit();
+        assert!(deposit >= MIN_ATTACHED_DEPOSIT, "Must attach at least 0.1 NEAR as deposit");
+        Promise::new(self.owner_id.clone()).transfer(deposit);
+        match self.adv_channel.get(&item_id) {
+            Some(mut val) => {
+                val.payment = deposit.to_string();
+                self.adv_channel.insert(&item_id, &val);
+                env::log("payment received".as_bytes());
+            }
+            None => {
+                env::log("payment error: channel_id not found".as_bytes());
+            }
+        }
+        env::log(env::signer_account_id().as_bytes());
+    }
+
 
     pub fn add_item_rubicon(&mut self,
                             channel: String,

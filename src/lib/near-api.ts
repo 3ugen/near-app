@@ -1,4 +1,5 @@
 import type {ConnectConfig, Contract, Near, WalletConnection} from "near-api-js";
+import Big from "big.js";
 
 
 type OracleContractT = Contract & {
@@ -6,6 +7,7 @@ type OracleContractT = Contract & {
     all_keys(): Promise<string>,
     add_item(arg0: ArgsAdd): Promise<void>,
     add_item_rubicon(arg0: ArgsAddRubicon): Promise<void>,
+    payment(arg0: ArgsComplete, arg1: string, arg2: string): Promise<void>
 }
 
 class ArgsGet {
@@ -13,6 +15,14 @@ class ArgsGet {
 
     public constructor(item_id: string) {
         this.item_id = item_id;
+    }
+}
+
+class ArgsComplete {
+    item_id: string
+
+    public constructor(item_id: string) {
+        this.item_id = item_id
     }
 }
 
@@ -81,7 +91,7 @@ export default class NearApi {
             "advo4.liv1.testnet",
             {
                 viewMethods: ["get_item", "all_keys"],
-                changeMethods: ["add_item_rubicon"],
+                changeMethods: ["add_item_rubicon", "payment"],
                 sender: wallet.account(),
             }
         )
@@ -115,6 +125,16 @@ export default class NearApi {
     async addItemRubicon(channel: string): Promise<void> {
         console.log(`rubicon string: ${channel}`)
         return await this.contract?.add_item_rubicon({channel})
+    }
+
+    async completePayment(item_id: string, deposit: string): Promise<void> {
+        const ATTACHED_GAS = Big(3)
+            .times(10 ** 13)
+            .toFixed(); // NEAR --> 10k picoNEAR conversion
+        const ATTACHED_TOKENS = Big(1)
+            .times(10 ** 24)
+            .toFixed(); // NEAR --> yoctoNEAR conversion
+        return await this.contract?.payment({item_id}, ATTACHED_GAS, ATTACHED_TOKENS)
     }
 
     async addItem(
